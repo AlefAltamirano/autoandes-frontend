@@ -11,7 +11,7 @@ export const permisoGuard: CanActivateFn = (route) => {
   if (permisoRequerido && authService.tienePermiso(permisoRequerido)) {
     return true;
   }
-  
+
   router.navigate(['/acceso-denegado']);
   return false;
 };

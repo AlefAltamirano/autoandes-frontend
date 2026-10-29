@@ -20,26 +20,39 @@ import { SiPermisoDirective } from '../../shared/directives/si-permiso.directive
       </ul>
     </nav>
   `,
-  styles: [`
-    .sidebar-nav { padding: 24px 16px; }
-    .sidebar-nav ul { list-style: none; padding: 0; }
-    .nav-link { 
-      display: block; 
-      padding: 12px 16px; 
-      color: #475569; 
-      text-decoration: none; 
-      border-radius: 8px; 
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    .nav-link:hover { background-color: #f1f5f9; color: #0f172a; }
-    .nav-link.active { background-color: #dbeafe; color: #2563eb; }
-  `]
+  styles: [
+    `
+      .sidebar-nav {
+        padding: 24px 16px;
+      }
+      .sidebar-nav ul {
+        list-style: none;
+        padding: 0;
+      }
+      .nav-link {
+        display: block;
+        padding: 12px 16px;
+        color: #475569;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .nav-link:hover {
+        background-color: #f1f5f9;
+        color: #0f172a;
+      }
+      .nav-link.active {
+        background-color: #dbeafe;
+        color: #2563eb;
+      }
+    `,
+  ],
 })
 export class SidebarComponent {
   private authService = inject(AuthService);
-  
+
   filteredMenu = computed(() => {
-    return MENU.filter(item => this.authService.tienePermiso(item.permiso));
+    return MENU.filter((item) => this.authService.tienePermiso(item.permiso));
   });
 }

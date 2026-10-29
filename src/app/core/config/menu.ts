@@ -7,7 +7,6 @@ export interface MenuItem {
   permiso: Permiso;
 }
 
-
 export const MENU: MenuItem[] = [
   { label: 'Servicios', icon: 'wrench', route: '/servicios', permiso: 'SERVICIO_LEER' },
   { label: 'Vehículos', icon: 'car', route: '/vehiculos', permiso: 'VEHICULO_LEER' },

@@ -1,59 +1,69 @@
-# AutoandesFrontend
+# AutoAndes Web
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.0.
+SPA Angular 22.2, TypeScript estricto, componentes standalone, formularios reactivos y sesión con signals.
 
-## Development server
+## Ejecutar
 
-To start a local development server, run:
+Requisitos: Node.js compatible con Angular 22 y npm. Backend en http://localhost:8080.
 
-```bash
-ng serve
+```powershell
+npm ci
+npx ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abrir http://localhost:4200. También puede usarse `npm start`.
+La URL se configura en `src/environments/environment.ts` y `environment.development.ts`; ambos usan el mismo puerto de backend.
 
-## Code scaffolding
+## Funciones
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Servicios: buscador, formulario único alta/edición, eliminación y baja/activación confirmadas.
+- Vehículos: nombre del cliente, filtro por cliente y lista desplegable obtenida desde el API.
+- Órdenes: FormArray con 1 a 10 líneas, cantidades 1 a 5, servicios activos sin repetir, estimado reactivo, 409 sin perder líneas y número devuelto por el backend.
+- Consulta: filtros de placa, estado y fechas, detalle y anulación con motivo de 10 a 200 caracteres.
+- Reporte de ingresos: datos agregados del backend por intervalo.
+- Rutas con carga diferida y permiso en data; authGuard en layout y rutas hijas; invitadoGuard en login; permisoGuard devuelve acceso denegado.
+- sessionStorage guarda sesión y expiración; signals actualizan el menú. Expiración automática y cierre manual. Interceptor de token restringido a la URL del API. Un 401 cierra sesión con returnUrl; un 403 conserva la sesión y muestra el mensaje.
+- Páginas de acceso denegado y 404. Campos de validación del backend se muestran bajo los controles.
+  No hay listas simuladas ni autorización por nombre de rol.
 
-```bash
-ng generate component component-name
+## Verificar
+
+```powershell
+npm run build
+npm test -- --watch=false
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Pruebas: arranque sin plantilla de bienvenida, sesión corrupta/vencida, expiración automática y tratamiento distinto de 401 y 403. La integración real se verifica también con el script del repositorio backend.
+Para comprobar un token alterado: iniciar sesión, abrir DevTools > Application > Session Storage, modificar token en `autoandes.sesion` y recargar una ruta con datos; la siguiente llamada devuelve 401 y redirige al login con returnUrl.
 
-```bash
-ng generate --help
-```
+## Usuarios de prueba
 
-## Building
+Contraseña de los cuatro usuarios: `Auto2026*`.
 
-To build the project run:
+- `admin`: ADMIN, todos los permisos.
+- `asesor`: ASESOR, consulta y registra vehículos y órdenes; no anula ni ve reportes.
+- `jefe`: JEFE_TALLER, mantiene servicios, anula órdenes y consulta reportes; no registra órdenes ni modifica vehículos.
+- `inactivo`: ASESOR inactivo, login rechazado con 401.
 
-```bash
-ng build
-```
+## Contrato del API
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Base: `http://localhost:8080/api/v1`. Solo el login es público; usar `Authorization: Bearer <token>`.
 
-## Running unit tests
+- `POST /auth/login`: username, password; devuelve token, tipo, expiraEnSegundos, nombreCompleto, roles, permisos.
+- `GET /auth/me`: usuario autenticado y permisos.
+- `GET /clientes`: VEHICULO_LEER.
+- `GET /servicios`, `GET /servicios/{id}`: SERVICIO_LEER.
+- `POST /servicios`, `PUT /servicios/{id}`, `DELETE /servicios/{id}`, `PATCH /servicios/{id}/estado`: SERVICIO_ESCRIBIR.
+- `GET /vehiculos?clienteId`, `GET /vehiculos/{id}`: VEHICULO_LEER.
+- `POST /vehiculos`, `PUT /vehiculos/{id}`, `DELETE /vehiculos/{id}`: VEHICULO_ESCRIBIR.
+- `POST /ordenes`: ORDEN_REGISTRAR; vehiculoId, kilometraje, detalles [{servicioId,cantidad}]. No acepta precios ni total del cliente.
+- `GET /ordenes?placa&estado&desde&hasta`, `GET /ordenes/{id}`: ORDEN_LEER.
+- `PATCH /ordenes/{id}/anular`: ORDEN_ANULAR; {motivo}.
+- `GET /reportes/ingresos-por-servicio?desde&hasta`: REPORTE_VER.
+  Fechas `desde` y `hasta`: `YYYY-MM-DD`, límites inclusivos por día.
+  Altas: 201; consultas/ediciones: 200; eliminación: 204. Errores: 400 validación, 401 autenticación, 403 permiso, 404 inexistente, 409 regla de negocio. Formato común: timestamp ISO, status, error, mensaje, ruta; campos solo en validación.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Entrega y trazabilidad
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Trabajo en `examen-a-altamirano`, integrado en `develop` y `main`; etiqueta `v1.0-examen-u2`.
+Las capturas documentan ejecución real. La demostración individual y la explicación del código corresponden al estudiante; revisar la guía de defensa antes de presentar.

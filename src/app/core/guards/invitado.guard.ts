@@ -9,7 +9,7 @@ export const invitadoGuard: CanActivateFn = () => {
   if (!authService.sesionActual()) {
     return true;
   }
-  
+
   router.navigate(['/']);
   return false;
 };

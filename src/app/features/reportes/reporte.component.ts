@@ -1,9 +1,82 @@
-import {Component,inject,signal} from '@angular/core';
-import {FormBuilder,ReactiveFormsModule} from '@angular/forms';
-import {CurrencyPipe} from '@angular/common';
-import {ReporteService} from '../../core/services/reporte.service';
-import {Ingreso} from '../../core/models/autoandes';
-@Component({imports:[ReactiveFormsModule,CurrencyPipe],template:`<section class="card"><p class="eyebrow">CONTROL DEL TALLER</p><h1>Ingresos por servicio</h1><p class="muted">Órdenes registradas; las anuladas se excluyen del reporte.</p><form class="filters" [formGroup]="form" (ngSubmit)="cargar()"><div><label for="desde">Desde</label><input id="desde" type="date" formControlName="desde"></div><div><label for="hasta">Hasta</label><input id="hasta" type="date" formControlName="hasta"></div><button class="btn btn-primary" [disabled]="cargando()">Consultar reporte</button></form>@if(error()){<p class="alert" role="alert">{{error()}}</p>}@if(cargando()){<p role="status">Cargando reporte…</p>}@else{<div class="table-scroll"><table><caption class="sr-only">Ingresos por servicio, mayor importe primero</caption><thead><tr><th>Código</th><th>Servicio</th><th>Cantidad total</th><th>Importe total</th></tr></thead><tbody>@for(r of items();track r.codigo){<tr><td>{{r.codigo}}</td><td>{{r.servicio}}</td><td>{{r.cantidadTotal}}</td><td>{{r.importeTotal | currency:'PEN':'S/ '}}</td></tr>}@empty{<tr><td colspan="4">No hay ingresos en el periodo seleccionado.</td></tr>}</tbody></table></div>}</section>`})
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { CurrencyPipe } from '@angular/common';
+import { ReporteService } from '../../core/services/reporte.service';
+import { Ingreso } from '../../core/models/autoandes';
+@Component({
+  imports: [ReactiveFormsModule, CurrencyPipe],
+  template: `<section class="card">
+    <p class="eyebrow">CONTROL DEL TALLER</p>
+    <h1>Ingresos por servicio</h1>
+    <p class="muted">Órdenes registradas; las anuladas se excluyen del reporte.</p>
+    <form class="filters" [formGroup]="form" (ngSubmit)="cargar()">
+      <div>
+        <label for="desde">Desde</label><input id="desde" type="date" formControlName="desde" />
+      </div>
+      <div>
+        <label for="hasta">Hasta</label><input id="hasta" type="date" formControlName="hasta" />
+      </div>
+      <button class="btn btn-primary" [disabled]="cargando()">Consultar reporte</button>
+    </form>
+    @if (error()) {
+      <p class="alert" role="alert">{{ error() }}</p>
+    }
+    @if (cargando()) {
+      <p role="status">Cargando reporte…</p>
+    } @else {
+      <div class="table-scroll">
+        <table>
+          <caption class="sr-only">
+            Ingresos por servicio, mayor importe primero
+          </caption>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Servicio</th>
+              <th>Cantidad total</th>
+              <th>Importe total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of items(); track r.codigo) {
+              <tr>
+                <td>{{ r.codigo }}</td>
+                <td>{{ r.servicio }}</td>
+                <td>{{ r.cantidadTotal }}</td>
+                <td>{{ r.importeTotal | currency: 'PEN' : 'S/ ' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4">No hay ingresos en el periodo seleccionado.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>`,
+})
 export class ReporteComponent {
- private api=inject(ReporteService);private fb=inject(FormBuilder);form=this.fb.nonNullable.group({desde:[''],hasta:['']});items=signal<Ingreso[]>([]);cargando=signal(true);error=signal('');constructor(){this.cargar();}cargar(){this.cargando.set(true);this.api.listar(this.form.getRawValue()).subscribe({next:x=>{this.items.set(x);this.cargando.set(false);},error:e=>{this.error.set(e.error?.mensaje??'No se pudo consultar');this.cargando.set(false);}});}
+  private api = inject(ReporteService);
+  private fb = inject(FormBuilder);
+  form = this.fb.nonNullable.group({ desde: [''], hasta: [''] });
+  items = signal<Ingreso[]>([]);
+  cargando = signal(true);
+  error = signal('');
+  constructor() {
+    this.cargar();
+  }
+  cargar() {
+    this.cargando.set(true);
+    this.api.listar(this.form.getRawValue()).subscribe({
+      next: (x) => {
+        this.items.set(x);
+        this.cargando.set(false);
+      },
+      error: (e) => {
+        this.error.set(e.error?.mensaje ?? 'No se pudo consultar');
+        this.cargando.set(false);
+      },
+    });
+  }
 }

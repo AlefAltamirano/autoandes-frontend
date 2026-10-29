@@ -7,7 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
   selector: 'app-login',
   imports: [ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
 
   loginForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
-    password: ['', Validators.required]
+    password: ['', Validators.required],
   });
 
   ngOnInit() {
@@ -37,12 +37,14 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.getRawValue()).subscribe({
       next: () => {
         const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-        this.router.navigateByUrl(returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/');
+        this.router.navigateByUrl(
+          returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/',
+        );
       },
       error: (err) => {
         this.cargando.set(false);
         this.errorMensaje.set(err.error?.mensaje ?? 'Error al iniciar sesión');
-      }
+      },
     });
   }
 }
